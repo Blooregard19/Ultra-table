@@ -240,7 +240,7 @@ d3.select("#main")
 
 d3.select("#oldal")
     .style("height", function(x) {return d3.select("#main").node().getBoundingClientRect().height + "px";});
-console.log(d3.select("#main").node().getBoundingClientRect().height);
+//console.log(d3.select("#main").node().getBoundingClientRect().height);
 
 var width = d3.select("#csempe").node().getBoundingClientRect().width,
     height = d3.select("#csempe").node().getBoundingClientRect().height;
@@ -443,7 +443,7 @@ var td = tr.append("td")
     .on("click", fejkereso );
   
 // kereső mező
-d3.select("#search")
+d3.select("#SearchBar")
       .on("keyup", function() { // filter according to key pressed 
         var searched_data = data,
             text = this.value.trim();
