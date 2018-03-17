@@ -471,6 +471,7 @@ d3.select("#SearchBar")
 		searched_data = [].concat.apply([], searched_data)
         
         // data bind with new data
+	melleklet.select("tbody").selectAll("tr").exit().rmove();
 		rows = melleklet.select("tbody").selectAll("tr")
 		  .data(searched_data, function(d){ return d.id; })
 		
@@ -485,10 +486,10 @@ d3.select("#SearchBar")
     .html(function(d) {return d.Nev;})
     .style("padding-left", function(d) {return d.Oszlop * 2 + "em";});
     //.on("click", nagyit );
-    tr.append("td").html(function(d) {return d.Kiadas;});
-    tr.append("td").html(function(d) {return d.Bevetel;});
-    tr.append("td").html(function(d) {return d.Fofunkcio;});
-    tr.append("td").html(function(d) {return felirat(d.Fejezet);});
+    newRows.append("td").html(function(d) {return d.Kiadas;});
+    newRows.append("td").html(function(d) {return d.Bevetel;});
+    newRows.append("td").html(function(d) {return d.Fofunkcio;});
+    newRows.append("td").html(function(d) {return felirat(d.Fejezet);});
        // row_entries = rows.selectAll("td")
        //     .data(function(d) { 
        //       var arr = [];
@@ -519,7 +520,7 @@ d3.select("#SearchBar")
         //.text(function(d) { return d; })
         
         // exit
-        rows.exit().remove();
+        //rows.exit().remove();
       })
 
 });
