@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>Citizens' Budget</title>
+	<script type="text/javascript" src="//d3js.org/d3.v4.min.js"></script>
+	<link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Cabin" />
+	<link href="https://fonts.googleapis.com/css?family=Dosis" rel="stylesheet">
+<style>
+html, body {
+	position: relative;
+	/*width: 100%;*/
+	/*height: 100%;*/
+	margin: 0;
+	padding: 0;
+	font: normal 14px "Dosis",Verdana,Arial,Helvetica,sans-serif;
+}
+
+#fo {
+  position:relative;
+  /*width: 100%;*/
+  /*min-width: 950px;*/
+  /*height: 100%;*/
+  /*min-height: 450px;*/
+  margin: 0 auto;
+  /*padding: 0 5px;*/
+  /*top: 30px;*/
+}
+.fejlec {
+  font: 10px sans-serif;
+  position: static;
+  display: inline-block;
+}
+
+
+#main {
+  position:absolute;
+  /*height: 96%;*/
+  /*min-height:550px;*/
+  /*width: 99%;*/
+  /*top: 260px;*/
+}
+
+#csempe {
+  font-size: 10px;
+  font-family: Cabin;
+  /*color: white;*/
+  /*font-family: 'Dosis', sans-serif;*/
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  bottom: 0px;
+  right: 205px;
+  overflow-y: hidden;
+}
+#oldal {
+ position: absolute;
+ top: 0px;
+ right: 0px;
+ width: 200px;
+ /*bottom: 0px;*/
+ overflow-y: auto;
+}
+.node {
+  box-sizing: border-box;
+  position: absolute;
+  overflow: hidden;
+  text-align: center;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}
+
+span {
+  vertical-align: middle;
+}
+	
+.node-label {
+  padding: 4px;
+  line-height: 1em;
+  white-space: pre;
+}
+
+.node-value {
+  color: rgba(0,0,0,0.8);
+  font-size: 9px;
+  margin-top: 1px;
+}
+table {
+  position: absolute;
+  margin: 10px;
+  font-size: 10px;
+}
+td {
+  padding: 5px;
+  border-bottom: 1px solid black;
+}
+.fejezetcim {
+  background-color: #779126;
+  color:#fff;
+}
+#lista {
+  list-style-type: none;	
+}
+#tipusval {
+  display: inline-block;
+}
+#tipusval input[type="radio"] {
+  display: none;
+}
+
+#tipusval label {
+  display: inline-block;
+  background-color: #ddd;
+  padding: 4px 11px;
+  font-family: Cabin;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+#tipusval input[type="radio"]:checked+label {
+  background-color: #779126;
+  color: #fff;
+}
+
+#tipusval input[type="radio"]:disabled+label {
+  background-color:#ddd;
+  color: #ddd;
+}
+#evval {
+  display: inline-block;
+}
+#evval {
+   /*background: url(http://i62.tinypic.com/15xvbd5.png) no-repeat 96% 0;*/
+   height: 25px;
+   /*overflow: hidden;*/
+   width: 80px;
+   -webkit-border-radius: 5px;
+   -moz-border-radius: 5px;
+   border-radius: 5px;
+   background-color: #779126;
+}
+#evval #year {
+   /*background: transparent;*/
+   background: #779126;
+   border: none;
+   font-size: 12px;
+   height: 25px;
+   padding: 5px; /* If you add too much padding here, the options won't show in IE */
+   width: 79px;
+   color: #fff;
+}
+#formaval {
+  display: inline-block;
+}
+#formaval input[type="radio"] {
+  display: none;
+}
+
+#formaval label {
+  display: inline-block;
+  background-color: #ddd;
+  padding: 4px 11px;
+  font-family: Cabin;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+#formaval input[type="radio"]:checked+label {
+  background-color: #779126;
+  color: #fff;
+}
+
+thead.fixedHeader {
+    display: block;
+}
+
+html>body tbody.scrollContent {
+    display: block;
+    overflow: auto;
+}
+
+</style>
+</head>
+
+<body>
+<div id = "fo">
+<div class = "fejlec">
+<div id = "formaval">
+<form>
+  <input type="radio" name="forma" class = "forma-radio" id="ngm" value="ngm"><label for="ngm">Hivatalos</label>
+  <input type="radio" name="forma" class = "forma-radio" id="csempe-gomb" value="csempeval" checked><label for="csempe-gomb">Csempe</label>
+</form>
+</div>
+<div id = "tipusval">
+<form>
+  <input type="radio" name="tipus" class = "tipus-radio" id="funk" value="funk" checked><label for="funk">Funkcionális</label>
+  <input type="radio" name="tipus" class = "tipus-radio" id="intezm" value="intezm"><label for="intezm">Intézményi</label>
+</form>
+</div>
+<div id = "evval">
+<select id = "year">
+  <option value="2014">2014</option>
+  <option value="2015">2015</option>
+  <option value="2016">2016</option>
+  <option value="2017">2017</option>
+  <option value="2018" selected>2018</option>
+</select>
+</div>
+</div>
+<div id = "main">
+<div id = "csempe">
+</div>
+<div id = "oldal">
+</div>
+
+</div>
+</div>
+<script type="text/javascript">
+
+var oldalmag = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
+var oldalszel = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+
+document.body.style.width = function(x) {return oldalszel + "px"};
+document.body.style.height = function(x) {return oldalmag + "px"};
+
+d3.select("#fo")
+    .style("height", function(x) {return oldalmag + "px"})
+    .style("width", function(x) {return oldalszel + "px"});
+
+var fejlecmag = d3.select(".fejlec").node().getBoundingClientRect().height;
+
+d3.select("#main")
+    .style("height", function(x) {return (oldalmag - fejlecmag) + "px"})
+    .style("width", function(x) {return oldalszel + "px"});
+
+d3.select("#oldal")
+    .style("height", function(x) {return d3.select("#main").node().getBoundingClientRect().height + "px";});
+console.log(d3.select("#main").node().getBoundingClientRect().height);
+
+var width = d3.select("#csempe").node().getBoundingClientRect().width,
+    height = d3.select("#csempe").node().getBoundingClientRect().height;
+
+var format = d3.format(",d");
+
+//var color = d3.scaleOrdinal(d3.schemeCategory20
+//        .map(function(c) { c = d3.rgb(c); c.opacity = 0.6; return c; }));
+var color = d3.scaleOrdinal([15, 75, 135, 195, 255, 315, 45, 105, 165, 225, 285, 345]
+        .map(function(c) { c = d3.hcl(c, 60, 70, 1); return c; }));
+//ggplot2 színek HCL mezőben: l = 65, c = 100, h 0-tól 375-ig 15-ös közökkel, d3.hcl függvénnyel előállíthatóak, de recycle kell és hozzárendelés
+//var stratify = d3.stratify()
+//    .parentId(function(d) { return d.id.substring(0, d.id.lastIndexOf(".")); });
+
+var nevek = [{"funkkod": "F01", "szoveg":"Általános közszolgáltaátsok"}, {"funkkod": "F01a", "szoveg":"Törvényhozás, állam működtetése"},{"funkkod": "F01b", "szoveg":"Pénzügyi és költségvetési tevékenységek"},{"funkkod": "F01c", "szoveg":"Külügyek"},{"funkkod": "F01d", "szoveg":"Alapkutatás"},{"funkkod": "F01e", "szoveg":"Műszaki fejlesztés"},{"funkkod": "F01f", "szoveg":"Egyéb közösségi szolgáltatások"},
+	     {"funkkod": "F02", "szoveg":"Védelem"},
+	     {"funkkod": "F03", "szoveg":"Rendvédelem és közbiztonság"},{"funkkod": "F03a", "szoveg":"Igazságszolgáltatás"},{"funkkod": "F03b", "szoveg":"Rend- és közbiztonság"},{"funkkod": "F03c", "szoveg":"Tűzvédelem"},{"funkkod": "F03d", "szoveg":"Büntetésvégrehajtás"},
+	     {"funkkod": "F04", "szoveg":"Oktatás"},{"funkkod": "F04a", "szoveg":"Iskolai előkészítés és alapfokú oktatás"},{"funkkod": "F04b", "szoveg":"Középfokú oktatás"},{"funkkod": "F04c", "szoveg":"Felsőfokú oktatás"},{"funkkod": "F04d", "szoveg":"Egyéb oktatás"},
+	     {"funkkod": "F05", "szoveg":"Egészségügy"},{"funkkod": "F05a", "szoveg":"Kórházi tevékenységek"},{"funkkod": "F05b", "szoveg":"Háziorvosi és gyermekorvosi szolgálat"},{"funkkod": "F05c", "szoveg":"Rendelői, orvosi, fogorvosi ellátás"},{"funkkod": "F05d", "szoveg":"Közegészségügy"},{"funkkod": "F05e", "szoveg":"Egyéb egészségügy"},
+	     {"funkkod": "F06", "szoveg":"Társadalombiztosítási és jóléti szolgálatások"},{"funkkod": "F06a", "szoveg":"Táppénz, anyasági vagy ideiglenes rokkantsági járadékok"},{"funkkod": "F06b", "szoveg":"Nyugdíj"},{"funkkod": "F06c", "szoveg":"Egyéb TB-ellátás"},{"funkkod": "F06d", "szoveg":"Munkanélküli ellátások"},{"funkkod": "F06e", "szoveg":"Családi pótlék és gyermekeknek járó juttatások"},{"funkkod": "F06f", "szoveg":"Egyéb szociális támogatások"},{"funkkod": "F06g", "szoveg":"Szociális és jóléti intézményi szolgáltatások"},
+	     {"funkkod": "F07", "szoveg":"Lakásügyek, települési és közösségi tevékenységek"},
+	     {"funkkod": "F08", "szoveg":"Szórakoztató, kulturális és vallási tevékenységek"},{"funkkod": "F08a", "szoveg":"Sport és szabadidős tevékenysége"},{"funkkod": "F08b", "szoveg":"Kultúra"},{"funkkod": "F08c", "szoveg":"Média"},{"funkkod": "F08d", "szoveg":"Vallás"},{"funkkod": "F08e", "szoveg":"Párttevékenységek"},{"funkkod": "F08f", "szoveg":"Egyéb közösségi tevékenységek"},
+	     {"funkkod": "F09", "szoveg":"Energetika"},
+	     {"funkkod": "F10", "szoveg":"Agrárkiadások"},
+	     {"funkkod": "F11", "szoveg":"Bányászat és ipar"},
+	     {"funkkod": "F12", "szoveg":"Közlekedés és távközlés"},{"funkkod": "F12a", "szoveg":"Közúti közlekedés"},{"funkkod": "F12b", "szoveg":"Vasúti közlekedés"},{"funkkod": "F12c", "szoveg":"Távközlés"},{"funkkod": "F12d", "szoveg":"Egyéb közlekedés"},
+	     {"funkkod": "F13", "szoveg":"Egyéb gazdasági tevékenység"},{"funkkod": "F13a", "szoveg":"Többcélú fejlesztési témák"},{"funkkod": "F13b", "szoveg":"Egyéb gazdasági tevékenységek"},
+	     {"funkkod": "F14", "szoveg":"Környezetvédelem"},
+	     {"funkkod": "F15", "szoveg":"Kamatkiadások"},
+	     {"funkkod": "F16", "szoveg":"Egyéb tételek"},
+	    { "funkkod":"FJ01","szoveg":"I. ORSZÁGGYŰLÉS" },
+  { "funkkod":"FJ02","szoveg":"II. KÖZTÁRSASÁGI ELNÖKSÉG" },
+  { "funkkod":"FJ03","szoveg":"III. ALKOTMÁNYBÍRÓSÁG" },
+  { "funkkod":"FJ04","szoveg":"IV. ALAPVETŐ JOGOK BIZTOSÁNAK HIVATALA" },
+  { "funkkod":"FJ05","szoveg":"V. ÁLLAMI SZÁMVEVŐSZÉK" },
+  { "funkkod":"FJ06","szoveg":"VI. BÍRÓSÁGOK" },
+  { "funkkod":"FJ08","szoveg":"VIII. ÜGYÉSZSÉG" },
+  { "funkkod":"FJ09","szoveg":"IX. HELYI ÖNKORMÁNYZATOK TÁMOGATÁSAI" },
+  { "funkkod":"FJ10","szoveg":"X. IGAZSÁGÜGYI MINISZTÉRIUM" },
+  { "funkkod":"FJ11","szoveg":"XI. MINISZTERELNÖKSÉG" },
+  { "funkkod":"FJ12","szoveg":"XII. FÖLDMŰVELÉSÜGYI MINISZTÉRIUM" },
+  { "funkkod":"FJ13","szoveg":"XIII. HONVÉDELMI MINISZTÉRIUM" },
+  { "funkkod":"FJ14","szoveg":"XIV. BELÜGYMINISZTÉRIUM" },
+  { "funkkod":"FJ15","szoveg":"XV. NEMZETGAZDASÁGI MINISZTÉRIUM" },
+  { "funkkod":"FJ16","szoveg":"XVI. NEMZETI ADÓ- ÉS VÁMHIVATAL" },
+  { "funkkod":"FJ17","szoveg":"XVII. NEMZETI FEJLESZTÉSI MINISZTÉRIUM" },
+  { "funkkod":"FJ18","szoveg":"XVIII. KÜLGAZDASÁGI ÉS KÜLÜGYMINISZTÉRIUM" },
+  { "funkkod":"FJ19","szoveg":"XIX. UNIÓS FEJLESZTÉSEK" },
+  { "funkkod":"FJ20","szoveg":"XX. EMBERI ERŐFORRÁSOK MINISZTÉRIUMA" },
+  { "funkkod":"FJ21","szoveg":"XXI. MINISZTERELNÖKI KABINETIRODA" },
+  { "funkkod":"FJ30","szoveg":"XXX. GAZDASÁGI VERSENYHIVATAL" },
+  { "funkkod":"FJ31","szoveg":"XXXI. KÖZPONTI STATISZTIKAI HIVATAL" },
+  { "funkkod":"FJ33","szoveg":"XXXIII. MAGYAR TUDOMÁNYOS AKADÉMIA" },
+  { "funkkod":"FJ34","szoveg":"XXXIV. MAGYAR MŰVÉSZETI AKADÉMIA" },
+  { "funkkod":"FJ35","szoveg":"XXXV. NEMZETI KUTATÁSI, FEJLESZTÉSI ÉS INNOVÁCIÓS HIVATAL" },
+  { "funkkod":"FJ41","szoveg":"XLI. ADÓSSÁGSZOLGÁLATTAL KAPCSOLATOS BEVÉTELEK ÉS KIADÁSOK" },
+  { "funkkod":"FJ42","szoveg":"XLII. A KÖLTSÉGVETÉS KÖZVETLEN BEVÉTELEI ÉS KIADÁSAI" },
+  { "funkkod":"FJ43","szoveg":"XLIII. AZ ÁLLAMI VAGYONNAL KAPCSOLATOS BEVÉTELEK ÉS KIADÁSOK" },
+  { "funkkod":"FJ44","szoveg":"XLIV. A NEMZETI FÖLDALAPPAL KAPCSOLATOS BEVÉTELEK ÉS KIADÁSOK" },
+  { "funkkod":"FJ62","szoveg":"LXII. NEMZETI KUTATÁSI, FEJLESZTÉSI ÉS INNOVÁCIÓS ALAP" },
+  { "funkkod":"FJ63","szoveg":"LXIII. NEMZETI FOGLALKOZTATÁSI ALAP" },
+  {"funkkod": "FJ64", "szoveg":"LXIV. SZÖVETKEZETI HITELINTÉZETEK INTEGRÁCIÓS ALAPJA"},
+  { "funkkod":"FJ65","szoveg":"LXV. BETHLEN GÁBOR ALAP" },
+  { "funkkod":"FJ66","szoveg":"LXVI. KÖZPONTI NUKLEÁRIS PÉNZÜGYI ALAP" },
+  { "funkkod":"FJ67","szoveg":"LXVII. NEMZETI KULTURÁLIS ALAP" },
+  {"funkkod":"FJ68", "szoveg":"LXIV. SZÖVETKEZETI HITELINTÉZETEK INTEGRÁCIÓS ALAPJA"},
+  {"funkkod":"FJ69", "szoveg":"LXIX. KUTATÁSI ÉS TECHNOLÓGIAI INNOVÁCIÓS ALAP"},
+  { "funkkod":"FJ71","szoveg":"LXXI. NYUGDÍJBIZTOSÍTÁSI ALAP" },
+  { "funkkod":"FJ72","szoveg":"LXXII. EGÉSZSÉGBIZTOSÍTÁSI ALAP" }];
+
+var keres = nevek.map(function(x) {return x.funkkod; });
+
+var ssv = d3.dsvFormat(";");
+
+var treemap = d3.treemap()
+    .size([width, height])
+    .padding(1)
+    .round(true);
+
+var ev = d3.select("#year").property("value");
+//console.log(d3.select("#year").property("value"));
+window.onload = rajzol;
+
+d3.selectAll('input[name="forma"]').on("change", aktival);
+	
+d3.selectAll('input[name="tipus"]').on("change", rajzol);
+
+d3.select("#year").on("change", evvaltoz);
+	
+function rajzol(m) {
+
+var ev = d3.select("#year").property("value");
+
+d3.request(ev + "_tv_01_mell_COFOG.csv")
+	.mimeType("text/plain")
+	.response(function(xhr) { return ssv.parse(xhr.responseText)})
+	.get(function(data) {
+
+data.forEach(function(d) {
+d.Kiadas = +d.Kiadas.replace(",", ".");
+//d.Fejezet = +d.Fejezet;
+});
+
+if (d3.select('input[name="tipus"]:checked').property("value") == "funk") {
+  var nested_data = d3.nest()
+  	//.key(function(d) { return d.Fo; })
+  	.key(function(d) { return d.Fofunkcio; })
+  	.key(function(d) { return d.Funkcio; })
+  	.rollup(function(d) {return d3.sum(d, function(d) {return parseFloat(d.Kiadas); }) });
+} else if (d3.select('input[name="tipus"]:checked').property("value") == "intezm") {
+  var nested_data = d3.nest()
+  	//.key(function(d) { return d.Fo; })
+  	//.key(function(d) { return romanize(d.Fejezet); })
+        .key(function(d) { return d.Fejezet; })
+  	//.key(function(d) { return "c" + d.Cim; })
+  	.rollup(function(d) {return d3.sum(d, function(d) {return parseFloat(d.Kiadas); }) });
+} 
+//console.log(nested_data);
+//takarítás
+//d3.select("#csempe").selectAll(".node").transition().duration(500).style("opacity", 0);
+d3.select("#csempe").selectAll(".node").remove();
+d3.select("#oldal").selectAll("ul").remove();
+//rajzolás
+var root = d3.hierarchy({values: nested_data.entries(data)}, function(d) { return d.values; })
+      .sum(function(d) { return d.value; })
+      .sort(function(a, b) {return d3.ascending(a.data.key, b.data.key);});
+
+ var abra = treemap(root);
+console.log(abra.children);
+//console.log(d3.select('input[name="tipus"]:checked').property("value"));
+  var cb = d3.select("#csempe")
+    .selectAll(".node")
+    .data(root.leaves())
+    .enter().append("div")
+      .attr("class", function(d) { return "node" + " " + d.parent.data.key + " " +d.data.key; })
+      .attr("title", function(d) { return d.data.key; })
+      .style("left", function(d) { return d.x0 + "px"; })
+      .style("top", function(d) { return d.y0 + "px"; })
+      .style("width", function(d) { return d.x1 - d.x0 + "px"; })
+      .style("height", function(d) { return d.y1 - d.y0 + "px"; })
+      .style("background", function(d) { while (d.depth > 1) d = d.parent; return color(d.data.key); })
+      //.style("background", '#fff') //vagy itt megadni normál hátteret és opacity-t 0-ra állítani, a transitionben pedig csak az opacity-t 1-re növelni
+      //.html(function(d) { return d.data.key + "<br>" + format(d.value/1000) + "Mrd Ft";})
+      //.html(function(d) { return felirat(d.data.key) + "<br>" + format(d.value/1000) + "Mrd Ft";})
+      .text(function(d) { return felirat(d.data.key);})      
+      .style("font-size", function(d) {return meret(felirat(d.data.key), (d.x1 - d.x0)*0.9, (d.y1 - d.y0)*0.9) + "em";})
+      .style("opacity", 0);
+      //cb.on("click", function() {console.log(d3.select(this).attr("title"));} ); //html-be írja ki a szöveget
+      cb.on("click", nagyit ); //html-be írja ki a szöveget
+    //cb.append("div") //divekbe írja ki a szöveget
+    //  .attr("class", function(d) { return "node-label" + " " + d.parent.data.key + " " +d.data.key; })
+    //  .text(function(d) { return d.data.key; })
+    //.append("div")
+    //  .attr("class", function(d) { return "node-value" + " " + d.parent.data.key + " " +d.data.key; })
+    //  .text(function(d) { return format(d.value/1000) + "Mrd Ft"; });
+    //.transition()
+    d3.selectAll(".node").transition() //nem egyszerre, hanem egymás után rajzolja ki a csempéket
+      .duration(500)
+      //.delay(function(d, i) { return Math.min(i * 10, 1500); })
+      .delay(function(d) { return d3.randomUniform(1, 1000)(); })
+      .style("opacity", 1);
+    
+  
+oldal(root.leaves());
+	
+//  var tabla = d3.select("#oldal").append("ul")
+//    .attr("id", "lista");
+//  var tr = tabla.selectAll("li")
+//    .data(abra.children)
+//    .enter().append("li")
+//    .attr("class", function(d) {return d.data.key;})
+//    .text(function(d) {return d.data.key;})
+//    .on("mouseover", highlight)
+//    .on("mouseout", unhighlight);
+
+});
+
+}
+
+function type(d) {
+  d.value = +d.value;
+  return d;
+}
+
+function atmenet(m) {
+
+var ev = d3.select("#year").property("value");
+
+d3.request(ev + "_tv_01_mell_COFOG.csv")
+	.mimeType("text/plain")
+	.response(function(xhr) { return ssv.parse(xhr.responseText)})
+	.get(function(data) {
+
+data.forEach(function(d) {
+d.Kiadas = +d.Kiadas.replace(",", ".");
+//d.Fejezet = +d.Fejezet;
+});
+
+if (d3.select('input[name="tipus"]:checked').property("value") == "funk") {
+  var nested_data = d3.nest()
+  	.key(function(d) { return d.Fofunkcio; })
+  	.key(function(d) { return d.Funkcio; })
+  	.rollup(function(d) {return d3.sum(d, function(d) {return parseFloat(d.Kiadas); }) });
+} else if (d3.select('input[name="tipus"]:checked').property("value") == "intezm") {
+  var nested_data = d3.nest()
+   	.key(function(d) { return d.Fejezet; })
+  	.rollup(function(d) {return d3.sum(d, function(d) {return parseFloat(d.Kiadas); }) });
+}
+//console.log(d3.select("#year").property("value"));
+d3.select("#oldal").selectAll("ul").remove();
+//rajzolás
+var root = d3.hierarchy({values: nested_data.entries(data)}, function(d) { return d.values; })
+      .sum(function(d) { return d.value; })
+      .sort(function(a, b) {return d3.ascending(a.data.key, b.data.key);});
+
+ var abra = treemap(root);
+//console.log(root.leaves());
+  var cb = d3.select("#csempe")
+    .selectAll(".node")
+    .data(root.leaves(), function(d) {return d.data.key; });
+    cb.enter().append("div")
+      .attr("class", function(d) { return "node" + " " + d.parent.data.key + " " +d.data.key; })
+      .attr("title", function(d) { return d.data.key; })
+      .style("left", function(d) { return d.x0 + "px"; })
+      .style("top", function(d) { return d.y0 + "px"; })
+      .style("width", function(d) { return d.x1 - d.x0 + "px"; })
+      .style("height", function(d) { return d.y1 - d.y0 + "px"; })
+      .style("background", function(d) { while (d.depth > 1) d = d.parent; return color(d.data.key); })
+      .text(function(d) { return felirat(d.data.key);})
+      .style("font-size", function(d) {return meret(felirat(d.data.key), (d.x1 - d.x0)*0.9, (d.y1 - d.y0)*0.9) + "em";})
+      .on("click", nagyit );
+    cb.on("click", nagyit );
+    cb.transition().duration(1000)
+      .style("left", function(d) { return d.x0 + "px"; })
+      .style("top", function(d) { return d.y0 + "px"; })
+      .style("width", function(d) { return d.x1 - d.x0 + "px"; })
+      .style("height", function(d) { return d.y1 - d.y0 + "px"; })
+      .style("background", function(d) { while (d.depth > 1) d = d.parent; return color(d.data.key); });
+    //cb.html(function(d) { return d.data.key + "<br>" + format(d.value/1000) + "Mrd Ft";});
+    //cb.html(function(d) { return felirat(d.data.key) + "<br>" + format(d.value/1000) + "Mrd Ft";})
+    cb.text(function(d) { return felirat(d.data.key);})
+      .style("font-size", function(d) {return meret(felirat(d.data.key), (d.x1 - d.x0)*0.9, (d.y1 - d.y0)*0.9) + "em";});
+    //d3.select("#csempe").selectAll(".node").exit().remove();
+    cb.exit().remove();
+ 
+oldal(root.leaves());
+
+});
+
+}
+
+function nagyit() {
+var azon = d3.select(this).attr("title");
+
+d3.select("#oldal").selectAll("ul").remove();
+d3.select("#csempe").selectAll(":not(." + azon + ")").remove();
+//d3.select("#csempe").selectAll(".node").remove();
+//console.log(azon);
+	
+d3.select("#csempe").select("." + azon + "")
+      .on("click", null);
+
+d3.select("#csempe").select("." + azon + "").transition().duration(200)
+      .style("left", function(d) { return "0" + "px"; })
+      .style("top", function(d) { return "0" + "px"; })
+      .style("width", function(d) { return width + "px"; })
+      .style("height", function(d) { return height + "px"; })
+      .style("font-size", "1em");
+
+var ev = d3.select("#year").property("value");
+
+d3.request(ev + "_tv_01_mell_COFOG.csv")
+	.mimeType("text/plain")
+	.response(function(xhr) { return ssv.parse(xhr.responseText)})
+	.get(function(data) {
+
+data.forEach(function(d) {
+d.Kiadas = +d.Kiadas.replace(",", ".");
+});
+
+if (d3.select('input[name="tipus"]:checked').property("value") == "funk") {
+  var data = data.filter(function (d) {return d.Funkcio === azon; })
+  var nested_data = d3.nest(data)
+  	.key(function(d) { return d.Fofunkcio; })
+  	.key(function(d) { return d.Funkcio; })
+        .key(function(d) { return d.AHTT; })
+  	.rollup(function(d) {return d3.sum(d, function(d) {return parseFloat(d.Kiadas); }) });
+} else if (d3.select('input[name="tipus"]:checked').property("value") == "intezm") {
+  var data = data.filter(function (d) {return d.Fejezet === azon; })
+  var nested_data = d3.nest(data)
+   	.key(function(d) { return d.Fejezet; })
+        .key(function(d) { return d.AHTT; })
+  	.rollup(function(d) {return d3.sum(d, function(d) {return parseFloat(d.Kiadas); }) });
+}
+
+var root = d3.hierarchy({values: nested_data.entries(data)}, function(d) { return d.values; })
+      .sum(function(d) { return d.value; })
+      .sort(function(a, b) {return b.value - a.value;});
+
+var abra = treemap(root);
+//console.log(root.leaves());
+var rooti = root.leaves();
+d3.timeout(function()  {
+  var cb = d3.select("#csempe").select("." + azon + "")
+    .selectAll(".node")
+    .data(rooti)
+    .enter().append("div")
+      .attr("class", function(d) { return "node" + " " + d.data.key;; })
+      .attr("title", function(d) { return d.data.key; })
+      .style("left", function(d) { return d.x0 + "px"; })
+      .style("top", function(d) { return d.y0 + "px"; })
+      .style("width", function(d) { return d.x1 - d.x0 + "px"; })
+      .style("height", function(d) { return d.y1 - d.y0 + "px"; })
+      .style("background", function(d) { while (d.depth > 1) d = d.parent; return color(d.data.key); })
+      //.style("background", '#fff') //vagy itt megadni normál hátteret és opacity-t 0-ra állítani, a transitionben pedig csak az opacity-t 1-re növelni
+      //.html(function(d) { return d.data.key + "<br>" + format(d.value/1000) + "Mrd Ft";})
+      //.html(function(d) { return felirat(d.data.key) + "<br>" + format(d.value/1000) + "Mrd Ft";})
+      .text(function(d) { return ahttnev(d.data.key, data);})
+      //.text(function(d) { return d.data.key;})
+      .style("font-size", function(d) {return meret(ahttnev(d.data.key, data), (d.x1 - d.x0)*0.9, (d.y1 - d.y0)*0.9) + "em";}) //a korábbi div betűtípusát örökli nem a 10 pontos Cabin-t
+      .style("opacity", 0); //html-be írja ki a szöveget
+    cb.on("click", visszanagyit );
+    //cb.append("div") //divekbe írja ki a szöveget
+    //  .attr("class", function(d) { return "node-label" + " " + d.parent.data.key + " " +d.data.key; })
+    //  .text(function(d) { return d.data.key; })
+    //.append("div")
+    //  .attr("class", function(d) { return "node-value" + " " + d.parent.data.key + " " +d.data.key; })
+    //  .text(function(d) { return format(d.value/1000) + "Mrd Ft"; });
+    //.transition()
+    d3.selectAll(".node").transition() //nem egyszerre, hanem egymás után rajzolja ki a csempéket
+      .duration(350)
+      //.delay(function(d, i) { return Math.min(i * 10, 1500); })
+      .delay(function(d) { return d3.randomUniform(1, 1000)(); })
+      .style("opacity", 1);
+    d3.select("#csempe").select("." + azon + "").transition().duration(200).delay(1300)
+	.style("background", "white");
+	}
+, 200);
+
+//d3.timeout(function()  { d3.select("#csempe").select("." + azon + "").transition().duration(200)
+//	.style("border-style", "solid");
+//	}
+//, 500);
+d3.select("#oldal").selectAll("table").remove();
+
+var tabla = d3.select("#oldal").append("table");
+  var tr = tabla.selectAll("tr")
+  	.data(rooti)
+  	.enter().append("tr");
+var td = tr.append("td")
+    .attr("class", function(d) {return d.data.key;})
+    .attr("title", function(d) { return d.data.key; })
+    .text(function(d) {return ahttnev(d.data.key, data);})
+    .on("mouseover", highlight)
+    .on("mouseout", unhighlight)
+    //.on("click", nagyit );
+  var td = tr.append("td")
+    .attr("class", function(d) {return d.data.key;})
+    .attr("title", function(d) { return d.data.key; })
+    //.text(function(d) {return format(d.value/1000) + "Mrd Ft";})
+    .text(function(d) {return formaz(d.value);})
+    .on("mouseover", highlight)
+    .on("mouseout", unhighlight)
+    //.on("click", nagyit );
+//oldal(root.leaves());	
+
+});
+}
+
+function position() { //csempék pozicionálása
+  this.style("left", function(d) { return d.x0 + "px"; })
+      .style("top", function(d) { return d.y0 + "px"; })
+      .style("width", function(d) { return d.x1 - d.x0 + "px"; })
+      .style("height", function(d) { return d.y1 - d.y0 + "px"; });
+}
+
+function oldal(abra) {
+
+d3.select("#oldal").selectAll("table").remove();
+//  var tabla = d3.select("#oldal").append("ul")
+//    .attr("id", "lista");
+//  var tr = tabla.selectAll("li")
+//    .data(abra.children)
+//    .enter().append("li")
+//    .attr("class", function(d) {return d.data.key;})
+//    .text(function(d) {return d.data.key;})
+//    .on("mouseover", highlight)
+//    .on("mouseout", unhighlight);	
+var tabla = d3.select("#oldal").append("table");
+  var tr = tabla.selectAll("tr")
+  	.data(abra)
+  	.enter().append("tr");
+  //var td = tr.selectAll("td") // ez nem jó megoldás volt, az alatta lévő helyes
+  //	.data(function(d) { return d.data.key;})
+  //	.enter().append("td")
+  //	.text(function(d) { return d;});
+
+  var td = tr.append("td")
+    .attr("class", function(d) {return d.data.key;})
+    .attr("title", function(d) { return d.data.key; })
+    .html(function(d) {return felirat(d.data.key);})
+    .on("mouseover", highlight)
+    .on("mouseout", unhighlight)
+    .on("click", nagyit );
+  var td = tr.append("td")
+    .attr("class", function(d) {return d.data.key;})
+    .attr("title", function(d) { return d.data.key; })
+    //.html(function(d) {return format(d.value/1000) + "Mrd Ft";})
+    .html(function(d) {return formaz(d.value);})
+    .on("mouseover", highlight)
+    .on("mouseout", unhighlight)
+    .on("click", nagyit );
+}
+
+function hivatalos(m) {
+var ev = d3.select("#year").property("value");
+
+d3.request(ev + "_tv_01_mell_COFOG.csv")
+	.mimeType("text/plain")
+	.response(function(xhr) { return ssv.parse(xhr.responseText)})
+	.get(function(data) {
+
+data.forEach(function(d) {
+d.Kiadas = +d.Kiadas.replace(",", ".");
+//d.Fejezet = +d.Fejezet;
+});
+
+d3.select("#csempe").selectAll(".node").remove();
+d3.select("#oldal").selectAll("table").remove();
+d3.select("#csempe").selectAll("table").remove();
+
+var melleklet = d3.select("#csempe").append("table");
+var fejlec = melleklet.append("thead")
+  .attr("class", "fixedHeader")
+  .attr("id", "tablafej")
+  //.style("width", function(x) {return d3.select("#csempe").node().getBoundingClientRect().width * 0.95 + "px";})
+  .append("tr");
+  fejlec.append("th").html("Megnevezés");
+  fejlec.append("th").html("Kiadás");
+  fejlec.append("th").html("Bevétet");
+  fejlec.append("th").html("Funkció");
+  fejlec.append("th").html("Fejezet");
+  var tr = melleklet.append("tbody")
+  	.attr("class", "scrollContent")
+  	.attr("id", "lapozotabla")
+  	.style("height", function(x) {return d3.select("#csempe").node().getBoundingClientRect().height * 0.95 + "px";})
+        //.style("width", function(x) {return d3.select("#csempe").node().getBoundingClientRect().width * 0.95 + "px";})
+  	.selectAll("tr")
+  	.data(data)
+  	.enter().append("tr")
+  	.attr("class", function(d) {if (d.Oszlop == 0) {return "fejezetcim";};})
+  	.attr("id", function(d) {if (d.Oszlop == 0) {return d.Fejezet;};});
+  
+  var td = tr.append("td")
+    //.attr("class", function(d) {return d.data.key;})
+    //.attr("title", function(d) { return d.data.key; })
+    .html(function(d) {return d.Nev;})
+    .style("padding-left", function(d) {return d.Oszlop * 2 + "em";});
+    //.on("click", nagyit );
+    tr.append("td").html(function(d) {return d.Kiadas;});
+    tr.append("td").html(function(d) {return d.Bevetel;});
+    tr.append("td").html(function(d) {return d.Fofunkcio;});
+    tr.append("td").html(function(d) {return felirat(d.Fejezet);});
+var group = document.querySelector('#lapozotabla');
+var cellak = group.getElementsByTagName('td');
+
+var group = document.querySelector('#tablafej');
+var fejek = group.getElementsByTagName('th');
+console.log(cellak);
+console.log(d3.select(fejek[0]).node().offsetWidth);
+d3.select(fejek[0]).style("width", function (d) {return d3.select(cellak[0]).node().offsetWidth + "px";});
+d3.select(fejek[1]).style("width", function (d) {return d3.select(cellak[1]).node().offsetWidth + "px";});
+d3.select(fejek[2]).style("width", function (d) {return d3.select(cellak[2]).node().offsetWidth + "px";});
+d3.select(fejek[3]).style("width", function (d) {return d3.select(cellak[3]).node().offsetWidth + "px";});
+d3.select(fejek[4]).style("width", function (d) {return d3.select(cellak[4]).node().offsetWidth + "px";});
+
+var fejezetek = data.filter(function(d) {return d.Oszlop == 0;});
+var tabla = d3.select("#oldal").append("table");
+  var tr = tabla.selectAll("tr")
+  	.data(fejezetek)
+  	.enter().append("tr");
+var td = tr.append("td")
+    .attr("class", function(d) {return d.Fejezet;})
+    .attr("title", function(d) { return d.Fejezet; })
+    .text(function(d) {return d.Nev;})
+    .on("click", fejkereso );
+  
+});
+}
+
+function highlight(d) {
+  var szines = d3.select(this).attr("class")
+  d3.select("#csempe").selectAll(":not(." + szines + ")")
+    .transition()
+    .delay(1500) //ne azonnal, hanem 1,5 másodperccel később emelje ki a keresett csempét
+    .duration(200)
+    .style("opacity", 0.2);
+}
+
+function unhighlight(d) {
+  var szines = d3.select(this).attr("class")
+  d3.select("#csempe").selectAll(":not(." + szines + ")")
+    .transition()
+    .duration(0)
+    .style("opacity", 1);
+}
+
+function formaz(ertek) {
+  if (ertek < 1000) {
+    return format(ertek) + "millió Ft"; };
+  if (ertek >= 1000) {
+    return format(ertek/1000) + "Mrd Ft"; };
+}
+	
+function visszanagyit() {
+  d3.select("#csempe").select("div").selectAll(".node").remove;
+  atmenet();
+}
+
+function romanize (num) {
+    if (!+num)
+        return false;
+    var digits = String(+num).split(""),
+        key = ["","C","CC","CCC","CD","D","DC","DCC","DCCC","CM",
+               "","X","XX","XXX","XL","L","LX","LXX","LXXX","XC",
+               "","I","II","III","IV","V","VI","VII","VIII","IX"],
+        roman = "",
+        i = 3;
+    while (i--)
+        roman = (key[+digits.pop() + (i * 10)] || "") + roman;
+    return Array(+digits.join("") + 1).join("M") + roman;
+}
+
+function felirat(kod) {
+  var kiiras = keres.indexOf(kod);
+  return nevek[kiiras].szoveg;
+}
+
+function ahttnev(ahtt, data) {
+for (var i in data) {
+    if (data[i].AHTT == ahtt) return data[i]["Nev"];
+}	
+}
+//szöveg hosszának mérése	
+function getTextWidth(text, font) {
+    // re-use canvas object for better performance
+    var canvas = getTextWidth.canvas || (getTextWidth.canvas = document.createElement("canvas"));
+    var context = canvas.getContext("2d");
+    context.font = font;
+    //context.font = "1em Cabin";
+    var metrics = context.measureText(text);
+    return metrics.width;
+}
+//szöveg méretének meghatározása
+function meret(szoveg, width, height) {
+  //text.each(function() {
+    //var text = d3.select(this),
+    var words = szoveg.split(/\s+/), //.reverse()
+	//hossz = words.forEach(function(d) { return getTextWidth(d, "1em Cabin"); }),
+	hossz = [],
+        krit = words[indexOfMax(hossz)];
+	//word,
+        //line = [],
+        //lineNumber = 0,
+        //lineHeight = 1.1; // ems
+        //y = text.attr("y"),
+        //dy = parseFloat(text.attr("dy")),
+        //tspan = text.text(null).append("tspan").attr("x", 0).attr("y", y).attr("dy", dy + "em");
+    for (var i = 0, len = words.length; i < len; i++) {
+      hossz.push(getTextWidth(words[i], "10px Cabin"));
+    }
+    var skala = width/d3.max(hossz); //kiszámoljuk, hogy a leghosszabb szövegrész hányszorosára növelhető maximum
+    var sorok = 1;
+    var sorhossz = 0;
+    for (var i = 0, len = words.length; i < len; i++) {
+      sorhossz = sorhossz + getTextWidth(words[i], "10px Cabin");
+      if (sorhossz > d3.max(hossz)) {
+        sorok = sorok + 1;
+	sorhossz = getTextWidth(words[i], "10px Cabin");
+      };
+    }
+    //var sorok = Math.ceil(getTextWidth(szoveg, "1em Cabin")/d3.max(hossz)); //kiszámoljuk hány sor várható (ez lecserlendő a loop-ra, ami sorban kumulálva számítja a sorokat)
+    if (sorok * 12 * skala > height) { //ha túl magas lenne a szöveg, akkor arányosan lecsökkentjük, hogy beférjen, a 12 a 10px Cabin sormagassága
+      skala = height/(sorok * 12);
+    } //ide még esetleg beszúrható egy maximális érték
+    return skala; //skala változót felhasználjuk, hogy hányszorosára nagyítsuk a betűt
+    //while (word = words.pop()) {
+    //  line.push(word);
+    //  tspan.text(line.join(" "));
+    //  if (tspan.node().getComputedTextLength() > width) {
+    //    line.pop();
+    //    tspan.text(line.join(" "));
+    //    line = [word];
+    //    tspan = text.append("tspan").attr("x", 0).attr("y", y).attr("dy", ++lineNumber * lineHeight + dy + "em").text(word);
+    //  }
+    //}
+  //});
+}
+//véhetően ez a függvény sem kell majd
+function indexOfMax(arr) {
+    if (arr.length === 0) {
+        return -1;
+    }
+
+    var max = arr[0];
+    var maxIndex = 0;
+
+    for (var i = 1; i < arr.length; i++) {
+        if (arr[i] > max) {
+            maxIndex = i;
+            max = arr[i];
+        }
+    }
+
+    return maxIndex;
+}
+
+function evvaltoz() {
+if ((d3.select('input[name="forma"]:checked').property("value") == "csempeval")) {
+atmenet();
+}
+if ((d3.select('input[name="forma"]:checked').property("value") == "ngm")) {
+hivatalos();
+}
+}
+
+function fejkereso() {
+var fejezet = d3.select(this).attr("class");
+var keresett = document.getElementById(fejezet);
+var tavolsag = keresett.offsetTop - 20;
+document.getElementById("lapozotabla").scrollTop = tavolsag;
+
+}
+
+function aktival() {
+if ((d3.select('input[name="forma"]:checked').property("value") == "csempeval")) {
+document.getElementById("funk").disabled=false;
+document.getElementById("intezm").disabled=false;
+d3.select("#csempe").selectAll("table").remove();
+rajzol();
+}
+
+if ((d3.select('input[name="forma"]:checked').property("value") == "ngm")) {
+document.getElementById("funk").disabled=true;
+document.getElementById("intezm").disabled=true;
+hivatalos();
+}
+
+}
+
+// Transition the rects
+//d3.select("p")
+//    .on("click", function() {
+        //Do something  on click
+//        cb.select("#flare.vis.operator.layout.NodeLinkTreeLayout 12,870")
+//          .transition
+//          .style("top", "100px")
+//    });
+  
+</script>
+</body>
+</html>
