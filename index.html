@@ -471,7 +471,7 @@ d3.select("#SearchBar")
 		searched_data = [].concat.apply([], searched_data)
         
         // data bind with new data
-	melleklet.select("tbody").selectAll("tr").exit().rmove();
+	melleklet.select("tbody").selectAll("tr").exit().remove();
 		rows = melleklet.select("tbody").selectAll("tr")
 		  .data(searched_data, function(d){ return d.id; })
 		
