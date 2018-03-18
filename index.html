@@ -489,7 +489,7 @@ console.log(searched_data);
          
         // enter td's in each row
 	var cells = newRows.selectAll("td")
-	  .data(function(d) {return [d.Nev, d.Kiadas, d.Bevetel, d.Fofunkcio, d.Fejezet];})
+	  .data(function(d) {return [d.Nev, d.Kiadas, d.Bevetel, d.Fofunkcio, felirat(d.Fejezet)];})
 	  .html(function(d) {return d;});
 	cells.enter()
           .append("td")
