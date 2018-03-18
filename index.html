@@ -488,16 +488,23 @@ console.log(searched_data);
 	                  .merge(rows);
          
         // enter td's in each row
-	var td = newRows.append("td")
+	var cells = newRows.selectAll("td")
+	  .data(function(d) {return [d.Nev, d.Kiadas, d.Bevetel, d.Fofunkcio, d.Fejezet];})
+	  .html(function(d) {return d;});
+	cells.enter()
+          .append("td")
+          .text(function(d) { return d; });
+	cells.exit().remove();
+//	var td = newRows.append("td")
     //.attr("class", function(d) {return d.data.key;})
     //.attr("title", function(d) { return d.data.key; })
-    .html(function(d) {return d.Nev;})
-    .style("padding-left", function(d) {return d.Oszlop * 2 + "em";});
+//    .html(function(d) {return d.Nev;})
+//    .style("padding-left", function(d) {return d.Oszlop * 2 + "em";});
     //.on("click", nagyit );
-    newRows.append("td").html(function(d) {return d.Kiadas;});
-    newRows.append("td").html(function(d) {return d.Bevetel;});
-    newRows.append("td").html(function(d) {return d.Fofunkcio;});
-    newRows.append("td").html(function(d) {return felirat(d.Fejezet);});
+//    newRows.append("td").html(function(d) {return d.Kiadas;});
+//    newRows.append("td").html(function(d) {return d.Bevetel;});
+//    newRows.append("td").html(function(d) {return d.Fofunkcio;});
+//    newRows.append("td").html(function(d) {return felirat(d.Fejezet);});
        // row_entries = rows.selectAll("td")
        //     .data(function(d) { 
        //       var arr = [];
