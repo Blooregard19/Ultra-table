@@ -484,8 +484,8 @@ console.log(searched_data);
 		  .data(searched_data, function(d){ return d.id; });
 		
         // enter the rows
-        var newRows = rows.enter()
-         .append("tr");
+        var newRows = rows.enter().append("tr")
+	                  .merge(rows);
          
         // enter td's in each row
 	var td = newRows.append("td")
