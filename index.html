@@ -472,7 +472,7 @@ d3.select("#SearchBar")
         //  })
         //})
 	searched_data = data.filter(function(d) {
-	var regex = new RegExp(text + ".*", "g");
+	var regex = new RegExp(text + ".*");
 	return regex.test(d.Nev);});
 
         // flatten array 
